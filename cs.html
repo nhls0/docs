@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SCADA <-> PLC</title>
+    <style>
+        /* Estilos generales */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Divisiones de la pantalla */
+        .panel {
+            flex: 1;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+
+        .izquierda {
+            background-color: #f0f8ff;
+        }
+
+        .derecha {
+            background-color: #fffaf0;
+        }
+
+        /* Estilos comunes */
+        h2 {
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        input {
+            display: block;
+            margin: 5px 0 15px;
+            padding: 10px;
+            width: calc(100% - 22px);
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px;
+            font-size: 16px;
+            margin: 10px 0;
+            cursor: pointer;
+        }
+
+        #resultados1, #resultados2 {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Panel Izquierdo -->
+    <div class="panel izquierda">
+        <h2>SCADA -> PLC</h2>
+        <label for="scada1">WORD</label>
+        <input id="scada1" type="number" placeholder="Sartu balorea">
+        
+        <label for="bit1">BIT</label>
+        <input id="bit1" type="number" placeholder="Sartu balorea">
+        
+        <button id="Kalkulatu1">KALKULATU</button>
+        <div id="resultados1" style="display: none;">
+            <p><strong>DB:</strong> <span id="resultado1-1"></span></p>
+            <p><strong>WORD:</strong> <span id="resultado1-2"></span></p>
+            <p><strong>BYTE:</strong> <span id="resultado1-3"></span></p>
+			<p><strong>BIT:</strong> <span id="resultado1-4"></span></p>
+        </div>
+    </div>
+
+    <!-- Panel Derecho -->
+    <div class="panel derecha">
+        <h2>PLC -> SCADA</h2>
+        <label for="db2">DB</label>
+        <input id="db2" type="number" placeholder="Sartu balorea">
+        
+        <label for="byte2">BYTE</label>
+        <input id="byte2" type="number" placeholder="Sartu balorea">
+        
+        <label for="bit2">BIT</label>
+        <input id="bit2" type="number" placeholder="Sartu balorea">
+        
+        <button id="Kalkulatu2">KALKULATU</button>
+        <div id="resultados2" style="display: none;">
+            <p><strong>WORD:</strong> <span id="resultado2-1"></span></p>
+            <p><strong>BIT:</strong> <span id="resultado2-2"></span></p>
+        </div>
+    </div>
+
+    <script>
+        // Funcionalidad del panel izquierdo
+        document.getElementById('Kalkulatu1').addEventListener('click', function() {
+            let scada = parseInt(document.getElementById('scada1').value);
+            let bit = parseInt(document.getElementById('bit1').value);
+            if (isNaN(scada) || isNaN(bit)) {
+                alert('SARTU BALORE EGOKIAK.');
+                return;
+            }
+
+            // Ejemplo de operaciones
+            let db = Math.floor(scada / 512 + 1);
+            let word=(scada-(db-1)*512)*2;
+			let byte_db=0;
+			
+            let bitResult = 0;
+			if ( bit > 7 ){
+				 byte_db=word;
+				 bitResult=bit-8;
+			}
+            else{
+			    byte_db=word+1;
+                bitResult=bit;
+			}
+
+            // Mostrar resultados
+            document.getElementById('resultado1-1').textContent = db;
+            document.getElementById('resultado1-2').textContent = word;
+			document.getElementById('resultado1-3').textContent = byte_db;
+            document.getElementById('resultado1-4').textContent = bitResult;
+            document.getElementById('resultados1').style.display = 'block';
+        });
+
+        // Funcionalidad del panel derecho
+        document.getElementById('Kalkulatu2').addEventListener('click', function() {
+            let db = parseInt(document.getElementById('db2').value);
+            let byte_db = parseInt(document.getElementById('byte2').value);
+            let bit = parseInt(document.getElementById('bit2').value);
+
+            if (isNaN(db) || isNaN(byte_db) || isNaN(bit)) {
+                alert('SARTU BALORE EGOKIAK.');
+                return;
+            }
+
+            // Ejemplo de operaciones
+            //let scada = (db - bit) / 10; // Operación ejemplo para nun. scada
+			let scada = Math.floor((db-1)*512 + byte_db/2);
+			let  bitResult = bit;
+			if ((byte_db % 2) == 0) {
+                bitResult = bitResult+8;
+			}
+            // Mostrar resultados
+            document.getElementById('resultado2-1').textContent = scada;
+            document.getElementById('resultado2-2').textContent = bitResult;
+            document.getElementById('resultados2').style.display = 'block';
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
